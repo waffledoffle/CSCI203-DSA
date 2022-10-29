@@ -38,6 +38,7 @@ public class Heap {
             temp[i] = heap[i];
         } 
         temp[heap.length] = added;
+        heap = temp;
         size = size + 1;
         siftUp(size - 1);
 
