@@ -5,16 +5,16 @@ public class AVLTree {
     static Node start;
     public static void main(String[] args) {
         start = new Node();
-        insert(3, start);
-        insert(2, start);
-        insert(1, start);
-        insert(4, start);
-        insert(5, start);
-        insert(6, start);
-        insert(7, start);
-        insert(16, start);
-        insert(15, start);
-        insert(14, start);
+        insertFirst(3);
+        insert(2, start, 1);
+        insert(1, start, 1);
+        insert(4, start, 1);
+        insert(5, start, 1);
+        insert(6, start, 1);
+        insert(7, start, 1);
+        insert(16, start, 1);
+        insert(15, start, 1);
+        insert(14, start, 1);
         visit(start);
 
     }
@@ -37,44 +37,57 @@ public class AVLTree {
         return left;
     }
 
-    public static void doubleRight(Node node) {
-        node = rotateLeft(node.getLeft());
-        rotateRight(node);
+    public static Node doubleRight(Node node) {
+        node.setLeft(rotateLeft(node.getLeft()));
+        node = rotateRight(node);
+        return node;
     }
 
-    public static void doubleLeft(Node node) {
-        node = rotateRight(node.getRight());
-        rotateLeft(node);
+    public static Node doubleLeft(Node node) {
+        node.setRight(rotateRight(node.getRight()));
+        node = rotateLeft(node);
+        return node;
     }
 
-    public static void insert(int value, Node node) {
+    public static void insertFirst(int value) {
+        start = new Node();
+        start.setValue(value);
+        start.setHeight(1);
+    }
+
+    public static Node insert(int value, Node node, int height) {
         if (node == null) {
             node = new Node();
             node.setValue(value);
+            node.setHeight(height);
+            return node;
         }
         else if (value < node.getValue()) {
-            insert(value, node.getLeft());
-            if (node.getLeft().getHeight() - node.getRight().getHeight() == 2) {
+            node.setLeft(insert(value, node.getLeft(), height + 1));
+            if (node.getLeft() != null && node.getRight() != null && node.getLeft().getHeight() - node.getRight().getHeight() == 2) {
                 if (value < node.getLeft().getValue()) {
-                    rotateRight(node);
+                    node = rotateRight(node);
+                    return node;
                 }
                 else {
-                    doubleRight(node);
+                    node = doubleRight(node);
+                    return node;
                 }
             }
         }
         else if (value > node.getValue()) {
-            insert(value, node.getRight());
+            node.setRight(insert(value, node.getRight(), height + 1));
             if (node.getRight().getHeight() - node.getLeft().getHeight() == 2) {
                 if (value < node.getRight().getValue()) {
-                    doubleLeft(node);
+                    node = doubleLeft(node);
                 }
                 else {
-                    rotateLeft(node);
+                    node = rotateLeft(node);
                 }
             }
         }
-        node.setHeight(Math.max(node.getLeft().getHeight(), node.getRight().getHeight()) + 1);
+        node.setHeight(height);
+        return node;
     }
 
     public static void visit(Node node) {
@@ -96,7 +109,7 @@ class Node {
 
     public Node() {
         value = 0;
-        height = 0;
+        height = 1;
     }
 
     public int getValue() {
