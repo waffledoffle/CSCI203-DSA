@@ -15,6 +15,7 @@ public class MergeSort {
        if (left < right) {
             int centre = left + (right - left) / 2;
 
+            System.out.println("Splitting array");
             mergeSort(array, left, centre);
             mergeSort(array, centre + 1, right);
 
