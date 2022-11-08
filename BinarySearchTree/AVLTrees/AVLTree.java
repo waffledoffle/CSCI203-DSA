@@ -4,17 +4,16 @@ import java.lang.Math;
 public class AVLTree {
     static Node start;
     public static void main(String[] args) {
-        start = new Node();
-        insertFirst(3);
-        insert(2, start, 1);
-        insert(1, start, 1);
-        insert(4, start, 1);
-        insert(5, start, 1);
-        insert(6, start, 1);
-        insert(7, start, 1);
-        insert(16, start, 1);
-        insert(15, start, 1);
-        insert(14, start, 1);
+        start = insert(3, start);
+        insert(2, start);
+        insert(1, start);
+        insert(4, start);
+        insert(5, start);
+        insert(6, start);
+        insert(7, start);
+        insert(16, start);
+        insert(15, start);
+        insert(14, start);
         visit(start);
 
     }
@@ -29,12 +28,26 @@ public class AVLTree {
     }
 
     public static Node rotateLeft(Node node) {
-        Node left = node.getRight();
-        node.setRight(left.getLeft());
-        left.setLeft(node);
-        node.setHeight(Math.max(node.getLeft().getHeight(), node.getRight().getHeight()) + 1);
-        left.setHeight(Math.max(left.getRight().getHeight(), node.getHeight()) + 1);
-        return left;
+        Node right = node.getRight();
+        int leftH = 0;
+        int rightH = 0;
+        node.setRight(right.getLeft());
+        right.setLeft(node);
+        if (node.getLeft() != null) {
+            leftH = node.getLeft().getHeight();
+        }
+        if (node.getRight() != null) {
+            rightH = node.getRight().getHeight();
+        }
+        node.setHeight(Math.max(leftH, rightH) + 1);
+        if (right.getLeft() != null) {
+            leftH = right.getLeft().getHeight();
+        }
+        if (right.getRight() != null) {
+            rightH = right.getRight().getHeight();
+        }
+        right.setHeight(Math.max(leftH, rightH) + 1);
+        return right;
     }
 
     public static Node doubleRight(Node node) {
@@ -49,35 +62,33 @@ public class AVLTree {
         return node;
     }
 
-    public static void insertFirst(int value) {
-        start = new Node();
-        start.setValue(value);
-        start.setHeight(1);
-    }
-
-    public static Node insert(int value, Node node, int height) {
+    public static Node insert(int value, Node node) {
         if (node == null) {
             node = new Node();
             node.setValue(value);
-            node.setHeight(height);
-            return node;
         }
-        else if (value < node.getValue()) {
-            node.setLeft(insert(value, node.getLeft(), height + 1));
-            if (node.getLeft() != null && node.getRight() != null && node.getLeft().getHeight() - node.getRight().getHeight() == 2) {
+        int left = 0;
+        int right = 0;
+        if (node.getLeft() != null) {
+           left = node.getLeft().getHeight();
+        }
+        if (node.getRight() != null) {
+            right = node.getRight().getHeight();
+        }
+        if (value < node.getValue()) {
+            node.setLeft(insert(value, node.getLeft()));
+            if (left - right > 1) {
                 if (value < node.getLeft().getValue()) {
                     node = rotateRight(node);
-                    return node;
                 }
                 else {
                     node = doubleRight(node);
-                    return node;
                 }
             }
         }
         else if (value > node.getValue()) {
-            node.setRight(insert(value, node.getRight(), height + 1));
-            if (node.getRight().getHeight() - node.getLeft().getHeight() == 2) {
+            node.setRight(insert(value, node.getRight()));
+            if (right - left > 1) {
                 if (value < node.getRight().getValue()) {
                     node = doubleLeft(node);
                 }
@@ -86,7 +97,7 @@ public class AVLTree {
                 }
             }
         }
-        node.setHeight(height);
+        node.setHeight(Math.max(left, right) + 1);
         return node;
     }
 
@@ -109,7 +120,7 @@ class Node {
 
     public Node() {
         value = 0;
-        height = 1;
+        height = 0;
     }
 
     public int getValue() {
